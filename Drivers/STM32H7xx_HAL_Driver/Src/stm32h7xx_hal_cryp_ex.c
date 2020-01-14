@@ -110,7 +110,7 @@ HAL_StatusTypeDef HAL_CRYPEx_AESGCM_GenerateAuthTAG(CRYP_HandleTypeDef *hcryp, u
 {
   uint32_t tickstart;
   uint64_t headerlength = (uint64_t)(hcryp->Init.HeaderSize) * 32U; /* Header length in bits */
-  uint64_t inputlength = (uint64_t)(hcryp->Size) * 8U; /* input length in bits */
+  uint64_t inputlength = (uint64_t)hcryp->SizesSum * 8U; /* input length in bits */
   uint32_t tagaddr = (uint32_t)AuthTag;
 
   if (hcryp->State == HAL_CRYP_STATE_READY)
@@ -149,7 +149,7 @@ HAL_StatusTypeDef HAL_CRYPEx_AESGCM_GenerateAuthTAG(CRYP_HandleTypeDef *hcryp, u
     /* Select final phase */
     MODIFY_REG(hcryp->Instance->CR, CRYP_CR_GCM_CCMPH, CRYP_PHASE_FINAL);
 
-    /*ALGODIR bit must be set to â€˜0â€™.*/
+    /*ALGODIR bit must be set to ‘0’.*/
     hcryp->Instance->CR &=  ~CRYP_CR_ALGODIR;
 
     /* Enable the CRYP peripheral */
@@ -303,7 +303,7 @@ HAL_StatusTypeDef HAL_CRYPEx_AESCCM_GenerateAuthTAG(CRYP_HandleTypeDef *hcryp, u
     /* Disable CRYP to start the final phase */
     __HAL_CRYP_DISABLE(hcryp);
 
-    /* Select final phase & ALGODIR bit must be set to â€˜0â€™. */
+    /* Select final phase & ALGODIR bit must be set to ‘0’. */
     MODIFY_REG(hcryp->Instance->CR, CRYP_CR_GCM_CCMPH | CRYP_CR_ALGODIR, CRYP_PHASE_FINAL | CRYP_OPERATINGMODE_ENCRYPT);
 
     /* Enable the CRYP peripheral */
