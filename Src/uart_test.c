@@ -3,7 +3,7 @@
 #include "stm32h7xx_hal.h"
 #include "logger.h"
 
-#define TIMEOUT_MS 10000
+#define TIMEOUT_MS 2000
 #define BUFFERSIZE 10
 
 UART_HandleTypeDef *ghwuart_ptr = NULL;
@@ -282,17 +282,37 @@ void uart_ISR_test(UART_HandleTypeDef *huart)
 
   while (1)
   {
-    uart_debug_error();
 
-    uint8_t buffer[256] = {0};
+    //uint8_t buffer[256] = {0};
+    uint8_t buffer[512] = {0};
 
     HAL_UART_Receive_IT(ghwuart_ptr, (uint8_t *)buffer, sizeof(buffer));
-    log_debug(WaitForUartReadyRx() ? "Rx Passed" : "Rx Fail");
+    if (WaitForUartReadyRx())
+    {
+      log_err("Rx Fail");
+    }
+
+    HAL_Delay(100);
 
     HAL_UART_Transmit_IT(ghwuart_ptr, (uint8_t *)buffer, sizeof(buffer));
-    log_debug(WaitForUartReadyTx() ? "Tx Passed" : "Tx Fail");
+    if (WaitForUartReadyTx())
+    {
+      log_err("Tx Fail");
+    }
+
+    HAL_Delay(100);
 
     log_hex_dump_info("Rx", buffer, sizeof(buffer));
+    HAL_Delay(100);
+
+    for (uint32_t i = 0 ; i < sizeof(buffer) ; i++)
+    {
+      if (buffer[i] != (i % 10))
+      {
+        log_info("Got valid %u bytes", (unsigned) i);
+        break;
+      }
+    }
   }
 
   return;

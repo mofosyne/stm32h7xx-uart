@@ -25,7 +25,7 @@ void log_hex_dump(const int type, const char* annotate, const void *addr, const 
 
 #if 1
 /* log_record */
-#define log_raw(   MSG, ...)  log_record(LOGGER_LOG_RAW,   MSG       , ##__VA_ARGS__)
+#define log_raw(   MSG, ...)  log_record(LOGGER_LOG_RAW,   MSG     , ##__VA_ARGS__)
 #define log_trace( MSG, ...)  log_record(LOGGER_LOG_TRACE, MSG "\n", ##__VA_ARGS__)
 #define log_debug( MSG, ...)  log_record(LOGGER_LOG_DEBUG, MSG "\n", ##__VA_ARGS__)
 #define log_info(  MSG, ...)  log_record(LOGGER_LOG_INFO,  MSG "\n", ##__VA_ARGS__)
