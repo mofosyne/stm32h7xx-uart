@@ -8,9 +8,6 @@
 
 UART_HandleTypeDef *ghwuart_ptr = NULL;
 
-
-
-
 /*** Status Checking ****************************/
 
 char* HAL_StatusTypeDef_to_str(uint8_t val)
@@ -268,11 +265,7 @@ bool WaitForUartReadyRx()
 }
 
 
-
-
-
 /*** test functions ***/
-
 
 void uart_ISR_test(UART_HandleTypeDef *huart)
 {
@@ -282,9 +275,7 @@ void uart_ISR_test(UART_HandleTypeDef *huart)
 
   while (1)
   {
-
-    //uint8_t buffer[256] = {0};
-    uint8_t buffer[512] = {0};
+    uint8_t buffer[256] = {0};
 
     HAL_UART_Receive_IT(ghwuart_ptr, (uint8_t *)buffer, sizeof(buffer));
     if (WaitForUartReadyRx())
@@ -309,7 +300,7 @@ void uart_ISR_test(UART_HandleTypeDef *huart)
     {
       if (buffer[i] != (i % 10))
       {
-        log_info("Got valid %u bytes", (unsigned) i);
+        log_info("Got only %u valid bytes out of %u", (unsigned) i, sizeof(buffer));
         break;
       }
     }

@@ -136,28 +136,28 @@ void log_hex_dump(const int type, const char* annotate, const void *addr, const 
   log_tx(annotate);
   log_tx(" :\n");
 
-  /* All zero check */
-  bool allzero = true;
+  /* Empty Check */
   for (uint32_t i = 0 ; i < nBytes ; i++)
   {
     const uint8_t *addr8 = addr;
-
-    if (addr8[i] != 0)
+    if (i == 0)
     {
-      allzero = false;
+      continue;
+    }
+    else if (addr8[i - 1] != addr8[i])
+    {
       break;
     }
-  }
-
-  if (allzero)
-  {
-    char buff[400] = {0}; // Line Buff
-    char *buff_ptr = buff;
-    const char *buff_end = buff + sizeof(buff) - 1;
-    buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, " 0 | 00 ... 00 (%u Bytes)", (unsigned) nBytes);
-    log_tx(buff);
-    log_tx("\n");
-    return;
+    else if ( (i + 1) == nBytes )
+    {
+      char buff[400] = {0}; // Line Buff
+      char *buff_ptr = buff;
+      const char *buff_end = buff + sizeof(buff) - 1;
+      buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, " 0 | All %02X (%u Bytes)", (unsigned) addr8[0], (unsigned) nBytes);
+      log_tx(buff);
+      log_tx("\n");
+      return;
+    }
   }
 
   /* Print Hex */
@@ -167,27 +167,6 @@ void log_hex_dump(const int type, const char* annotate, const void *addr, const 
     char buff[400] = {0}; // Line Buff
     char *buff_ptr = buff;
     const char *buff_end = buff + sizeof(buff) - 1;
-
-#if 0
-    bool zerorowDetected = true;
-    // Zero Row Check
-    for (uint8_t i = 0 ; i < byte_per_row ; i++)
-    {
-      if ((offset + i) >= nBytes)
-        break;
-      if (addr_ptr[offset + i] != 0)
-        zerorowDetected = false;
-    }
-
-    if (zerorowDetected)
-    {
-      buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, " %4u | 00 ... 00", (unsigned) offset);
-      log_tx(buff);
-      log_tx("\n");
-      offset += byte_per_row;
-      continue;
-    }
-#endif
 
     // HEX
     buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, " %4u | ", (unsigned) offset);
