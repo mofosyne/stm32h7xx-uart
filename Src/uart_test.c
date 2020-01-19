@@ -277,7 +277,7 @@ void uart_ISR_test(UART_HandleTypeDef *huart)
   while (1)
   {
     //uint8_t buffer[256] = {0};
-    uint8_t buffer[512] = {0};
+    uint8_t buffer[256 - 12] = {0};
 
     HAL_UART_Abort(ghwuart_ptr);
     log_info("************************* Rx *********************************");
@@ -290,26 +290,26 @@ void uart_ISR_test(UART_HandleTypeDef *huart)
     else
     {
       log_err("Rx Received (%s)", HAL_StatusTypeDef_to_str(halStatus));
-      for (uint32_t i = 0 ; i < sizeof(buffer) ; i++)
+    }
+    for (uint32_t i = 0 ; i < sizeof(buffer) ; i++)
+    {
+      if (buffer[i] != ((i % 9) + 1))
       {
-        if (buffer[i] != ((i % 9) + 1))
-        {
-          log_err("Got only %u valid bytes out of %u", (unsigned) i, sizeof(buffer));
-          break;
-        }
-        else if ((i + 1) >= sizeof(buffer))
-        {
-          log_info("Got %u valid bytes", sizeof(buffer));
-        }
+        log_err("Got only %u valid bytes out of %u", (unsigned) i, sizeof(buffer));
+        break;
+      }
+      else if ((i + 1) >= sizeof(buffer))
+      {
+        log_info("Got %u valid bytes", sizeof(buffer));
       }
     }
     HAL_Delay(100);
     log_hex_dump_info("Rx", buffer, sizeof(buffer));
     HAL_Delay(500);
 
-#if 0
+#if 1
     log_info("************************* Tx *********************************");
-    uint8_t testmessage[] = "This is a test message \r\n";
+    uint8_t testmessage[] = "Testing!!\r\n";
 
     halStatus = HAL_UART_Transmit_IT(ghwuart_ptr, (uint8_t *)testmessage, sizeof(testmessage));
     if (!WaitForUartReadyTx())
