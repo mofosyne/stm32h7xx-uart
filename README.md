@@ -1,3 +1,10 @@
+This is an example of a uart based project. Currently investigating why 256 bytes using uart hal is not read correctly.
+
+
+--------------
+
+Forked from:
+
 # stm32h7xx-cubemx-makefile-openocd-gdbgui-example
 
 This is a makefile based workflow experiment on programming and automated CI build/test of this board.
