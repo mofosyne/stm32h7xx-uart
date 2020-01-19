@@ -177,6 +177,7 @@ void log_hex_dump(const int type, const char* annotate, const void *addr, const 
       buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, " %02x", addr_ptr[offset + i]);
     }
 
+#if 0
     // PRINTABLE
     buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, "  :  ");
     for (uint8_t i = 0 ; i < byte_per_row ; i++)
@@ -186,6 +187,7 @@ void log_hex_dump(const int type, const char* annotate, const void *addr, const 
       char c = isprint(addr_ptr[offset + i]) ? addr_ptr[offset + i] : '.';
       buff_ptr += snprintf(buff_ptr, buff_end - buff_ptr, "%c", c);
     }
+#endif
 
     log_tx(buff);
     log_tx("\n");
