@@ -55,7 +55,7 @@ char* uart_error_to_str(uint8_t val)
 
 void uart_debug_error()
 {
-#define checkBitChange(ccount, curr_reg, prev_reg, mask, msg) if ((curr_reg & mask) != (prev_reg & mask)) {log_info("(%d) %s bit %s : %s",ccount, #mask, (curr_reg & mask)?"set":"cleared", msg);}
+#define checkBitChange(ccount, curr_reg, prev_reg, mask, msg) if ((curr_reg & mask) != (prev_reg & mask)) {log_raw("(%d) %s bit %s : %s",ccount, #mask, (curr_reg & mask)?"set":"cleared", msg);}
   static int count = 0;
   static uint32_t prev_CR1 = 0;
   static uint32_t prev_CR2 = 0;
@@ -143,7 +143,7 @@ void uart_debug_error()
   }
   else if (curr_ISR != prev_ISR)
   {
-    //log_info("%4d: curr_ISR = (%08lX --> %08lX) changes detected:", (int) count, (long unsigned) prev_ISR, (long unsigned) curr_ISR);
+    //log_raw("%4d: curr_ISR = (%08lX --> %08lX) changes detected:", (int) count, (long unsigned) prev_ISR, (long unsigned) curr_ISR);
     checkBitChange(count, curr_ISR, prev_ISR, USART_ISR_PE         , "Parity Error");
     checkBitChange(count, curr_ISR, prev_ISR, USART_ISR_FE         , "Framing Error");
     checkBitChange(count, curr_ISR, prev_ISR, USART_ISR_NE         , "Noise detected Flag");
@@ -188,9 +188,9 @@ void uart_debug_print()
       static int count = 0;\
       static uint32_t prev = 0;\
       if (!count) \
-        { log_info("%4d: %40s = %08lX : %s", (int) count, (char*) #X, (long unsigned) X, (char*) MSG); count++;}\
+        { log_raw("%4d: %40s = %08lX : %s", (int) count, (char*) #X, (long unsigned) X, (char*) MSG); count++;}\
       else if (prev != X) \
-        { log_info("%4d: %40s = (%08lX --> %08lX) : %s", (int) count, (char*) #X, (long unsigned) prev, (long unsigned) X, (char*) MSG); count++;}\
+        { log_raw("%4d: %40s = (%08lX --> %08lX) : %s", (int) count, (char*) #X, (long unsigned) prev, (long unsigned) X, (char*) MSG); count++;}\
       prev = X;\
     }
 #if 0
@@ -267,59 +267,61 @@ bool WaitForUartReadyRx()
 
 /*** test functions ***/
 
+void uart_ISR_impulse(const char *txStr, int nBytes)
+{
+  HAL_StatusTypeDef halStatus = 0;
+  bool waitStatus = false;
+  uint8_t buffer[1000] = {0};
+
+  /* Calculate String Length */
+  uint16_t txStr_len = 0;
+  for (txStr_len = 0; txStr[txStr_len]; (txStr_len)++);
+
+  HAL_UART_Abort(ghwuart_ptr);
+
+  /* Tx */
+  log_raw("\n");
+  log_raw("## Testing %u Bytes\n", nBytes);
+  halStatus = HAL_UART_Transmit_IT(ghwuart_ptr, (uint8_t *)txStr, (uint16_t) txStr_len);
+  waitStatus = WaitForUartReadyTx();
+  log_raw(" * Tx '%s' : %s (%s)\n", txStr, waitStatus ? "Done" : "Timeout", HAL_StatusTypeDef_to_str(halStatus));
+
+  /* Rx */
+  halStatus = HAL_UART_Receive_IT(ghwuart_ptr, (uint8_t *)buffer, (uint16_t) nBytes);
+  waitStatus = WaitForUartReadyRx();
+  log_raw(" * Rx : %s (%s)\n", waitStatus ? "Done" : "Timeout", HAL_StatusTypeDef_to_str(halStatus));
+
+  /* Verify */
+  for (uint32_t i = 0 ; i < nBytes ; i++)
+  {
+    if (buffer[i] != ((i % 9) + 1))
+    {
+      log_raw(" * Failed : Got only %u valid bytes out of %u\n", (unsigned) i, (unsigned) nBytes);
+      break;
+    }
+    else if ((i + 1) >= nBytes)
+    {
+      log_raw(" * Success : Got all %u bytes\n", (unsigned) nBytes);
+    }
+  }
+
+  log_hex_dump_raw(" * Rx", buffer, nBytes);
+}
+
 void uart_ISR_test(UART_HandleTypeDef *huart)
 {
-  HAL_StatusTypeDef halStatus;
   ghwuart_ptr = huart;
 
-  log_info("Uart Test Start");
+  log_init_swo();
+  log_raw("# Uart Test Start #\n");
 
   while (1)
   {
-    //uint8_t buffer[256] = {0};
-    uint8_t buffer[256 - 12] = {0};
-
-    HAL_UART_Abort(ghwuart_ptr);
-    log_info("************************* Rx *********************************");
-
-    halStatus = HAL_UART_Receive_IT(ghwuart_ptr, (uint8_t *)buffer, sizeof(buffer));
-    if (!WaitForUartReadyRx())
-    {
-      log_err("Rx Timeout (%s)", HAL_StatusTypeDef_to_str(halStatus));
-    }
-    else
-    {
-      log_err("Rx Received (%s)", HAL_StatusTypeDef_to_str(halStatus));
-    }
-    for (uint32_t i = 0 ; i < sizeof(buffer) ; i++)
-    {
-      if (buffer[i] != ((i % 9) + 1))
-      {
-        log_err("Got only %u valid bytes out of %u", (unsigned) i, sizeof(buffer));
-        break;
-      }
-      else if ((i + 1) >= sizeof(buffer))
-      {
-        log_info("Got %u valid bytes", sizeof(buffer));
-      }
-    }
-    HAL_Delay(100);
-    log_hex_dump_info("Rx", buffer, sizeof(buffer));
-    HAL_Delay(500);
-
-#if 1
-    log_info("************************* Tx *********************************");
-    uint8_t testmessage[] = "Testing!!\r\n";
-
-    halStatus = HAL_UART_Transmit_IT(ghwuart_ptr, (uint8_t *)testmessage, sizeof(testmessage));
-    if (!WaitForUartReadyTx())
-    {
-      log_err("Tx Fail (%s)", HAL_StatusTypeDef_to_str(halStatus));
-    }
-
-    HAL_Delay(100);
-#endif
-
+    log_raw("\n\n---\n\n");
+    log_raw("# stm32h7 uart test #\n");
+    uart_ISR_impulse("244", 244);
+    uart_ISR_impulse("256", 256);
+    uart_ISR_impulse("268", 268);
   }
 
   return;

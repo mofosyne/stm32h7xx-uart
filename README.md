@@ -1,6 +1,5 @@
 This is an example of a uart based project. Currently investigating why 256 bytes using uart hal is not read correctly.
 
-
 ```
 # Load and run test on micro
 make swd
@@ -8,17 +7,19 @@ make swd
 # Turn on swo viewer
 ./swo_parser.py
 
-# Send test data to device
+# Turn on impulse test python script
 ./stm32_impulse_test.py /dev/tty.usbmodem14403
 ```
 
-## For hal uart rx buffer size of 256-12
+# stm32h7 uart test #
+
+## Testing 244 Bytes
+ * Tx '244' : Done (HAL_OK)
+ * Rx : Done (HAL_OK)
+ * Success : Got all 244 bytes
+ * Rx :
 
 ```
-I: ************************* Rx *********************************
-E: Rx Received (HAL_OK)
-I: Got 244 valid bytes
-I: Rx :
     0 |  01 02 03 04 05 06 07 08 09 01 02 03 04 05 06 07
    16 |  08 09 01 02 03 04 05 06 07 08 09 01 02 03 04 05
    32 |  06 07 08 09 01 02 03 04 05 06 07 08 09 01 02 03
@@ -37,15 +38,21 @@ I: Rx :
   240 |  07 08 09 01
 ```
 
-## For hal uart rx buffer size of 256+12
+## Testing 256 Bytes
+ * Tx '256' : Done (HAL_OK)
+ * Rx : Timeout (HAL_OK)
+ * Failed : Got only 0 valid bytes out of 256
+ * Rx : 0 | All 00 (256 Bytes)
+
+## Testing 268 Bytes
+ * Tx '268' : Done (HAL_OK)
+ * Rx : Timeout (HAL_OK)
+ * Failed : Got only 12 valid bytes out of 268
+ * Rx :
 
 ```
-I: ************************* Rx *********************************
-E: Rx Timeout (HAL_OK)
-E: Got only 12 valid bytes out of 268
-I: Rx :
-    0 |  01 02 03 04 05 06 07 08 09 01 02 03 01 02 03 04
-   16 |  05 06 07 08 09 01 02 03 00 00 00 00 00 00 00 00
+    0 |  01 02 03 04 05 06 07 08 09 01 02 03 00 00 00 00
+   16 |  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
    32 |  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
    48 |  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
    64 |  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -63,15 +70,6 @@ I: Rx :
   256 |  00 00 00 00 00 00 00 00 00 00 00 00
 ```
 
-## For hal uart rx buffer size of 256
-
-```
-I: ************************* Rx *********************************
-E: Rx Timeout (HAL_OK)
-E: Got only 0 valid bytes out of 256
-I: Rx :
- 0 | All 00 (256 Bytes)
-```
 
 --------------
 
