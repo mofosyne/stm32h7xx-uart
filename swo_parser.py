@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#  https://raw.githubusercontent.com/robertlong13/SWO-Parser/master/swo_parser.py
+#  https://github.com/robertlong13/SWO-Parser
 #
 #  This program is free software. It comes without any
 #  warranty, to the extent permitted by applicable law.
