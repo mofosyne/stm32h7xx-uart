@@ -3,14 +3,14 @@
 #include "stm32h7xx_hal.h"
 #include "logger.h"
 
-#define TIMEOUT_MS 5000
+#define TIMEOUT_MS 1000
 #define BUFFERSIZE 10
 
 UART_HandleTypeDef *ghwuart_ptr = NULL;
 
 /*** Status Checking ****************************/
 
-char* HAL_StatusTypeDef_to_str(uint8_t val)
+char *HAL_StatusTypeDef_to_str(uint8_t val)
 {
   switch (val)
   {
@@ -22,7 +22,7 @@ char* HAL_StatusTypeDef_to_str(uint8_t val)
   }
 }
 
-char* uart_state_to_str(uint8_t val)
+char *uart_state_to_str(uint8_t val)
 {
   switch (val)
   {
@@ -38,7 +38,7 @@ char* uart_state_to_str(uint8_t val)
   }
 }
 
-char* uart_error_to_str(uint8_t val)
+char *uart_error_to_str(uint8_t val)
 {
   switch (val)
   {
@@ -194,30 +194,30 @@ void uart_debug_print()
       prev = X;\
     }
 #if 0
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->TxXferSize        , "UART Tx Transfer size");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->TxXferCount       , "UART Tx Transfer Counter");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->RxXferSize        , "UART Rx Transfer size");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->RxXferCount       , "UART Rx Transfer Counter");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Mask              , "UART Rx RDR register mask");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->FifoMode          , "Specifies if the FIFO mode is being used.");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->NbRxDataToProcess , "Number of data to process during RX ISR execution");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->NbTxDataToProcess , "Number of data to process during TX ISR execution");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Lock              , (ghwuart_ptr->Lock == 0x01) ? "Locked" : "Unlocked");
-  BOOTLOADER_PRINTREG_MON( HAL_UART_GetState(ghwuart_ptr) , uart_state_to_str(HAL_UART_GetState(ghwuart_ptr)));
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->ErrorCode         , uart_error_to_str(ghwuart_ptr->ErrorCode));
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->TxXferSize        , "UART Tx Transfer size");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->TxXferCount       , "UART Tx Transfer Counter");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->RxXferSize        , "UART Rx Transfer size");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->RxXferCount       , "UART Rx Transfer Counter");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Mask              , "UART Rx RDR register mask");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->FifoMode          , "Specifies if the FIFO mode is being used.");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->NbRxDataToProcess , "Number of data to process during RX ISR execution");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->NbTxDataToProcess , "Number of data to process during TX ISR execution");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Lock              , (ghwuart_ptr->Lock == 0x01) ? "Locked" : "Unlocked");
+  BOOTLOADER_PRINTREG_MON(HAL_UART_GetState(ghwuart_ptr) , uart_state_to_str(HAL_UART_GetState(ghwuart_ptr)));
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->ErrorCode         , uart_error_to_str(ghwuart_ptr->ErrorCode));
 #endif
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->CR1     , "USART Control register 1");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->CR2     , "USART Control register 2");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->CR3     , "USART Control register 3");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->BRR     , "USART Baud rate register");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->GTPR    , "USART Guard time and prescaler register");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->RTOR    , "USART Receiver Time Out register");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->RQR     , "USART Request register");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->ISR     , "USART Interrupt and status register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->CR1     , "USART Control register 1");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->CR2     , "USART Control register 2");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->CR3     , "USART Control register 3");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->BRR     , "USART Baud rate register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->GTPR    , "USART Guard time and prescaler register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->RTOR    , "USART Receiver Time Out register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->RQR     , "USART Request register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->ISR     , "USART Interrupt and status register");
   //BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->ICR     , "USART Interrupt flag Clear register");
   //BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->RDR     , "USART Receive Data register");
   //BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->TDR     , "USART Transmit Data register");
-  BOOTLOADER_PRINTREG_MON( ghwuart_ptr->Instance->PRESC   , "USART clock Prescaler register");
+  BOOTLOADER_PRINTREG_MON(ghwuart_ptr->Instance->PRESC   , "USART clock Prescaler register");
 }
 
 /*** Callback ***/
@@ -241,7 +241,7 @@ bool WaitForUartReadyTx()
   uint32_t start = HAL_GetTick();
   while (!UartReadyTx)
   {
-    if ( (HAL_GetTick() - start) > TIMEOUT_MS)
+    if ((HAL_GetTick() - start) > TIMEOUT_MS)
     {
       return false;
     }
@@ -255,7 +255,7 @@ bool WaitForUartReadyRx()
   uint32_t start = HAL_GetTick();
   while (!UartReadyRx)
   {
-    if ( (HAL_GetTick() - start) > TIMEOUT_MS)
+    if ((HAL_GetTick() - start) > TIMEOUT_MS)
     {
       return false;
     }
